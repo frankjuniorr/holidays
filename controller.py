@@ -1,5 +1,11 @@
 import datetime
 import math
+import smtplib
+import os
+import sys
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
 from icalendar import Calendar, Event
 
 # ============================================
@@ -31,7 +37,9 @@ def calculate_pascoa(ano):
 
     return datetime.date(ano, pascoa_month, pascoa_day)
 
-
+# ============================================
+# Função auxiliar que retorna o ano corrente
+# ============================================
 def get_year():
     DECEMBER = 12
 
@@ -83,6 +91,22 @@ def holiday_check(holiday_date):
   return dates
 
 # ============================================
+def get_environment_variables(env_var_name):
+    """
+    Get Environment Variables from system
+    """
+    EXIT_ERROR = 1
+    env_var = None
+    try:
+        env_var = os.environ[env_var_name]
+    except:
+        print(f"Fill the {env_var_name} environment var fisrt")
+        sys.exit(EXIT_ERROR)
+
+    return env_var
+
+
+# ============================================
 # Create Event() object
 # ============================================
 def _create_event(holiday_date):
@@ -106,6 +130,17 @@ def create_calendar(events_list):
     return calendar
 
 # ============================================
+# Create a list with Event() objects
+# ============================================
+def create_events_list(holidays_list):
+    events_list = []
+    for event in holidays_list:
+        event = _create_event(event)
+        events_list.append(event)
+
+    return events_list
+
+# ============================================
 # Create .ics file
 # ============================================
 def save_file(calendar):
@@ -123,16 +158,13 @@ def add_carnaval(pascoa_date):
     carnaval_inicio = pascoa_date - datetime.timedelta(days=51)
     carnaval_fim = carnaval_inicio + datetime.timedelta(days=6)
 
-    # carnaval_inicio_string = carnaval_inicio.strftime("%Y-%m-%d")
-    # carnaval_fim_string = carnaval_fim.strftime("%Y-%m-%d")
-
     holiday_date = {
         "summary": "[FERIADO] Carnaval",
         "startDate": carnaval_inicio,
         "endDate": carnaval_fim,
     }
 
-    return _create_event(holiday_date)
+    return holiday_date
 
 # ============================================
 # Função que adiciona a data da Semana Santa
@@ -148,13 +180,13 @@ def add_semana_santa(pascoa_date):
     "endDate": semana_santa,
     }
 
-    return _create_event(holiday_date)
+    return holiday_date
 
 
 # ============================================
 # Função genérica que adiciona qualquer feriado
 # ============================================
-def add_feriado(ano, mes, dia, summary):
+def add_holiday(ano, mes, dia, summary):
 
   feriado = datetime.date(ano, mes, dia)
   holiday_dates = holiday_check(feriado)
@@ -166,4 +198,56 @@ def add_feriado(ano, mes, dia, summary):
         "endDate": holiday_dates["end_date"],
     }
 
-    return _create_event(holiday_date)
+    return holiday_date
+
+# ============================================
+# Função que envia o email, baseado em alguns valores em variáveis de ambiente.
+# Recebendo o 'total_holidays' como parãmetro para incrementar no body do email.
+# ============================================
+def send_email(total_holidays):
+    year = get_year()
+    server = 'smtp.gmail.com:587'
+
+    email_from = get_environment_variables("EMAIL_FROM")
+    email_to = get_environment_variables("EMAIL_TO")
+    email_password = get_environment_variables("EMAIL_PASSWORD")
+
+    email_subject = f"All Holidays {year}"
+    body = f"""
+    <html>
+        <body>
+            <p>
+            Hello,<br>
+            Here is all holidays of <b>{year}</b><br>
+            Total Holidays: <b>{total_holidays}</b><br><br>
+
+            For more information, see the <a href="https://github.com/frankjuniorr/holidays">source code</a>
+            </p>
+        </body>
+        </html>
+    """
+
+    message = MIMEMultipart()
+    message["Subject"] = email_subject
+    message["From"] = email_from
+    message["To"] = email_to
+
+    message.add_header("Content-Type", "text/html")
+    message.attach(MIMEText(body, "html"))
+
+    file_name = f"holidays_{year}.ics"
+    with open(file_name, "rb") as file:
+        attachment = MIMEApplication(file.read(), Name=file_name)
+
+    attachment['Content-Disposition'] = f'attachment; filename="{file_name}"'
+    message.attach(attachment)
+
+    smtp = smtplib.SMTP(server)
+    smtp.starttls()
+    smtp.login(email_from, email_password)
+
+    smtp.sendmail(email_from, email_to, message.as_string().encode('utf-8'))
+    smtp.close()
+    print("Email sent")
+
+

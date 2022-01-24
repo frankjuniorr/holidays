@@ -23,60 +23,60 @@ def dinamic_holidays(year):
   # Adicionando a Semana Santa
   semana_santa_event = controller.add_semana_santa(pascoa_date)
 
-  events_list.append(carnaval_event)
-  events_list.append(semana_santa_event)
+  holidays_list.append(carnaval_event)
+  holidays_list.append(semana_santa_event)
 
 # ============================================
 # Função que adiciona todos os feriados que tem data fixa.
 # ============================================
 def static_holidays(year):
-    holidays_list = []
+    static_holidays_list = []
 
     # 1 de Janeiro
-    holidays_list.append({"mes": 1, "dia": 1, "summary": "Ano Novo"})
+    static_holidays_list.append({"month": 1, "day": 1, "summary": "Ano Novo"})
 
     # 6 de Março
-    holidays_list.append({"mes": 3, "dia": 6, "summary": "Carta Magna"})
+    static_holidays_list.append({"month": 3, "day": 6, "summary": "Carta Magna"})
 
     # 21 de Abril
-    holidays_list.append({"mes": 4, "dia": 21, "summary": "Tiradentes"})
+    static_holidays_list.append({"month": 4, "day": 21, "summary": "Tiradentes"})
 
     # 1 de Maio
-    holidays_list.append({"mes": 5, "dia": 1, "summary": "Dia do Trabalhador"})
+    static_holidays_list.append({"month": 5, "day": 1, "summary": "day do Trabalhador"})
 
     # 24 de Junho
-    holidays_list.append({"mes": 6, "dia": 24, "summary": "São João"})
+    static_holidays_list.append({"month": 6, "day": 24, "summary": "São João"})
 
     # 16 de Julho
-    holidays_list.append({"mes": 7, "dia": 16, "summary": "Nossa Senhora do Carmo"})
+    static_holidays_list.append({"month": 7, "day": 16, "summary": "Nossa Senhora do Carmo"})
 
     # 7 de Setembro
-    holidays_list.append({"mes": 9, "dia": 7, "summary": "Independência do Brasil"})
+    static_holidays_list.append({"month": 9, "day": 7, "summary": "Independência do Brasil"})
 
     # 12 de Outubro - Nossa Senhroa Aparecida
-    holidays_list.append({"mes": 10, "dia": 12, "summary": "Dia das Crianças"})
+    static_holidays_list.append({"month": 10, "day": 12, "summary": "day das Crianças"})
 
     # 2 de Novembro
-    holidays_list.append({"mes": 11, "dia": 2, "summary": "Finados"})
+    static_holidays_list.append({"month": 11, "day": 2, "summary": "Finados"})
 
     # 15 de Novembro
-    holidays_list.append({"mes": 11, "dia": 15,"summary": "Proclamação da República"})
+    static_holidays_list.append({"month": 11, "day": 15,"summary": "Proclamação da República"})
 
     # 8 de Dezembro
-    holidays_list.append({"mes": 12, "dia": 8,"summary": "Nossa Senhora da Conceição"})
+    static_holidays_list.append({"month": 12, "day": 8,"summary": "Nossa Senhora da Conceição"})
 
     # 25 de Dezembro
-    holidays_list.append({"mes": 12, "dia": 25, "summary": "Natal"})
+    static_holidays_list.append({"month": 12, "day": 25, "summary": "Natal"})
 
     # adicionando todos os feriados d euma vez
-    for index in range(len(holidays_list)):
-      mes = holidays_list[index]["mes"]
-      dia = holidays_list[index]["dia"]
-      summary = holidays_list[index]["summary"]
+    for index in range(len(static_holidays_list)):
+      month = static_holidays_list[index]["month"]
+      day = static_holidays_list[index]["day"]
+      summary = static_holidays_list[index]["summary"]
 
-      holiday_event = controller.add_feriado(year, mes, dia, summary)
+      holiday_event = controller.add_holiday(year, month, day, summary)
       if holiday_event != None:
-        events_list.append(holiday_event)
+        holidays_list.append(holiday_event)
 
 
 # ============================================
@@ -84,21 +84,26 @@ def static_holidays(year):
 # ============================================
 def main():
 
-    print(" ========= Addind holidays =========")
+    print("Buildind holidays")
     year = controller.get_year()
 
-    # # ================ Feriados Dinâmicos ================
+    # ================ Feriados Dinâmicos ================
     dinamic_holidays(year)
 
-    # # ================ Feriados Estáticos ================
+    # ================ Feriados Estáticos ================
     static_holidays(year)
 
+    events_list = controller.create_events_list(holidays_list)
     calendar = controller.create_calendar(events_list)
 
-    print(" ========= saving .ics file =========")
+    print("Saving .ics file")
     controller.save_file(calendar)
+
+    print("Sendind Email")
+    total_holidays = len(holidays_list)
+    controller.send_email(total_holidays)
 
 if __name__ == '__main__':
 
-    events_list = []
+    holidays_list = []
     main()
