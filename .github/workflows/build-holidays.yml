@@ -6,6 +6,8 @@ name: Build Holidays
 on:
   schedule:
     - cron:  '0 10 1 1 *' # Run every 1º January
+    
+  workflow_dispatch:
 
 jobs:
 
