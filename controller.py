@@ -206,11 +206,12 @@ def add_holiday(ano, mes, dia, summary):
 # ============================================
 def send_email(total_holidays):
     year = get_year()
-    server = 'smtp.gmail.com:587'
+    server = 'smtp.gmail.com'
+    port = 587
 
     email_from = get_environment_variables("EMAIL_FROM")
     email_to = get_environment_variables("EMAIL_TO")
-    email_password = get_environment_variables("EMAIL_PASSWORD")
+    email_password = get_environment_variables("EMAIL_APP_PASSWORD")
 
     email_subject = f"All Holidays {year}"
     body = f"""
@@ -242,8 +243,10 @@ def send_email(total_holidays):
     attachment['Content-Disposition'] = f'attachment; filename="{file_name}"'
     message.attach(attachment)
 
-    smtp = smtplib.SMTP(server)
+    smtp = smtplib.SMTP(server, port)
+    smtp.ehlo()
     smtp.starttls()
+    smtp.ehlo()
     smtp.login(email_from, email_password)
 
     smtp.sendmail(email_from, email_to, message.as_string().encode('utf-8'))

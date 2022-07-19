@@ -16,11 +16,16 @@ This file generated is sent by email, and user should be import manually in Goog
 - The script only add holidays that different to Saturday and Sunday
 - The script also add Carnival \o/
 
+## Pre-requisite
+
+1. Enable an [2-step-authentication](https://support.google.com/accounts/answer/185839) in yout Google Account (this is necessary to next step)
+2. Create and [App Password](https://support.google.com/accounts/answer/185833) to `Mail`
+
 ## Config
 The script use the environment variables to config email:
 - EMAIL_FROM: Sender email
 - EMAIL_TO: Receiver email
-- EMAIL_PASSWORD: Password of sender email
+- EMAIL_APP_PASSWORD: App Password created
 
 ## Install
 
@@ -33,7 +38,7 @@ Create a file called `.env` with this content:
 ```bash
 export EMAIL_FROM="sender_email@email.com"
 export EMAIL_TO="receiver_email@email.com"
-export EMAIL_PASSWORD="PASSWORD_OF_SENDER_EMAIL"
+export EMAIL_APP_PASSWORD="<APP_PASSWORD>"
 ```
 After, run `source .env`
 

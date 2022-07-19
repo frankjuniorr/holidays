@@ -54,7 +54,7 @@ def static_holidays(year):
     static_holidays_list.append({"month": 9, "day": 7, "summary": "Independência do Brasil"})
 
     # 12 de Outubro - Nossa Senhroa Aparecida
-    static_holidays_list.append({"month": 10, "day": 12, "summary": "day das Crianças"})
+    static_holidays_list.append({"month": 10, "day": 12, "summary": "dia das Crianças"})
 
     # 2 de Novembro
     static_holidays_list.append({"month": 11, "day": 2, "summary": "Finados"})
