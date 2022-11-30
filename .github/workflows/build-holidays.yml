@@ -5,7 +5,7 @@ name: Build Holidays
 
 on:
   schedule:
-    - cron:  '0 10 1 1 *' # Run every 1º January
+    - cron:  '0 14 2 12 *' # Run every 1º December
 
   workflow_dispatch:
 
